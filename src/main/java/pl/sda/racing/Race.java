@@ -1,19 +1,24 @@
 package pl.sda.racing;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Race {
     @Id
-            @GeneratedValue
-     private Long id;
+    @GeneratedValue
+    private Long id;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Result> results;
 
-
-    private  List<Pigeon> pigeons;
+    public Race withId(Long id) {
+        return new Race(id, results);
+    }
 }

@@ -1,46 +1,21 @@
 package pl.sda.racing;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
+import pl.sda.racing.importing.FromFileRaceSupplier;
+import pl.sda.racing.importing.Importer;
+import pl.sda.racing.repository.RaceRepository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.io.File;
-import java.util.List;
-
-public class    Application {
+public class Application {
     public static void main(String[] args) {
-        Pigeon pigeon = new Pigeon();
-        pigeon.setName("Bialy");
-        pigeon.setOwner("Janusz");
 
-        SessionFactory sessionFactory= new Configuration()
-                .configure(new File("resources/hibernate.cfg.xml")).buildSessionFactory();
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        RaceRepository raceRepository = new RaceRepository(sessionFactory);
+        new Importer(raceRepository, new FromFileRaceSupplier()).importRaceIntoDb();
 
-        session.save(pigeon);
+        raceRepository.getAll().forEach(
+                System.out::println
+        );
 
-        transaction.commit();
-        session.close();
-
-        Session newSession=sessionFactory.openSession();
-        CriteriaBuilder criteriaBuilder=newSession.getCriteriaBuilder();
-        CriteriaQuery<Pigeon> cr = criteriaBuilder.createQuery(Pigeon.class);
-        Root<Pigeon> root = cr.from(Pigeon.class);
-        cr.select(root);
-
-        Query<Pigeon> query = newSession.createQuery(cr);
-        List<Pigeon> results = query.getResultList();
-        for (Pigeon result : results) {
-            System.out.println(result);
-        }
-        sessionFactory.close();
-
-        System.out.println();
     }
 }
