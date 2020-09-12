@@ -13,7 +13,7 @@ import java.time.Duration;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result {
+public class Result implements Comparable <Result> {
     @Id
     @GeneratedValue
     private Long id;
@@ -23,5 +23,10 @@ public class Result {
 
     public Result withAbsoluteTime(Duration base) {
         return new Result(id, pigeon, time.plus(base));
+    }
+
+    @Override
+    public int compareTo(Result result) {
+       return time.compareTo(result.getTime());
     }
 }
